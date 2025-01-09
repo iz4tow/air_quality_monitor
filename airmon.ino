@@ -3,7 +3,7 @@
 
 // WiFi credentials
 const char* ssid = "WIFI_AP_SSID";
-const char* password = "WIFI PASSWORD";
+const char* password = "WIFI_SECRET_PASS";
 
 // Define MQ135 sensor pin
 #define MQ135_PIN A0
@@ -149,11 +149,11 @@ void sendNotFoundResponse(WiFiClient& client) {
                     String(localIP[3]);
 
   // Prepare the 404 response content
-  String response = "Please visit http://" + ipString + "/api/data";
+  String response = "Please visit <a href=http://" + ipString + "/api/data>http://" + ipString + "/api/data</a>";
 
   // Send the HTTP response
   client.println("HTTP/1.1 404 Not Found");
-  client.println("Content-Type: text/plain");
+  client.println("Content-Type: text/html");
   client.println("Connection: close");
   client.println("Content-Length: " + String(response.length())); // Explicit content length
   client.println(); // Blank line separating headers from body
