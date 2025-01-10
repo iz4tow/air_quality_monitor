@@ -1,4 +1,5 @@
-# air_quality_monitor
+# Air Quality Monitor
+## With Arduino WIFI R.2 sensor and Go Server
 A simple air quality monitor with Arduino UNO WIFI R2 and a Go server
 
 ## Hardware
