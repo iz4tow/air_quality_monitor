@@ -1,2 +1,8 @@
 2025/01/10 11:14:33 Starting program
 2025/01/10 11:14:33 Fetching data from API
+2025/01/10 11:21:26 Starting program
+2025/01/10 11:21:26 Fetching data from API
+2025/01/10 11:21:56 CONNECTION TO WEBSERVER FAILED: Get "http://192.168.155.34/api/data": dial tcp 192.168.155.34:80: i/o timeout
+2025/01/10 11:26:46 Starting program
+2025/01/10 11:26:46 Fetching data from API
+2025/01/10 11:26:46 CONNECTION TO WEBSERVER FAILED: Get "http://192.168.155.34/api/data": net/http: HTTP/1.x transport connection broken: unexpected EOF

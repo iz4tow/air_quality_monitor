@@ -85,7 +85,7 @@ func main() {
 		resp, err := http.Get(fmt.Sprintf("http://%s/api/data", *host))
 		if err != nil {
 			logger.Printf("CONNECTION TO WEBSERVER FAILED: %v", err)
-			time.Sleep(30 * time.Minute)
+			time.Sleep(3 * time.Minute)
 			continue
 		}
 		defer resp.Body.Close()
@@ -93,14 +93,14 @@ func main() {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			logger.Printf("Failed to read response body: %v", err)
-			time.Sleep(30 * time.Minute)
+			time.Sleep(1 * time.Minute)
 			continue
 		}
 
 		var data SensorData
 		if err := json.Unmarshal(body, &data); err != nil {
 			logger.Printf("Failed to parse JSON: %v", err)
-			time.Sleep(30 * time.Minute)
+			time.Sleep(1 * time.Minute)
 			continue
 		}
 		logger.Printf("Data received: %+v", data)
