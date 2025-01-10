@@ -79,12 +79,12 @@ func main() {
 		logger.Fatalf("DB ERROR: %v", err)
 	}
 
-	logger.Println("Starting program")
+	logger.Println("INFO - Starting program")
 	for {
-		logger.Println("Fetching data from API")
+		logger.Println("INFO - Fetching data from API")
 		resp, err := http.Get(fmt.Sprintf("http://%s/api/data", *host))
 		if err != nil {
-			logger.Printf("CONNECTION TO WEBSERVER FAILED: %v", err)
+			logger.Printf("FATAL - CONNECTION TO WEBSERVER FAILED: %v", err)
 			time.Sleep(3 * time.Minute)
 			continue
 		}
@@ -92,26 +92,26 @@ func main() {
 
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			logger.Printf("Failed to read response body: %v", err)
+			logger.Printf("FATAL - Failed to read response body: %v", err)
 			time.Sleep(1 * time.Minute)
 			continue
 		}
 
 		var data SensorData
 		if err := json.Unmarshal(body, &data); err != nil {
-			logger.Printf("Failed to parse JSON: %v", err)
+			logger.Printf("FATAL -  Failed to parse JSON: %v", err)
 			time.Sleep(1 * time.Minute)
 			continue
 		}
-		logger.Printf("Data received: %+v", data)
+		logger.Printf("INFO - Data received: %+v", data)
 
 		_, err = db.Exec(`INSERT INTO sensor_data (timestamp, temperature, humidity, co2, nh3, nox) VALUES (?, ?, ?, ?, ?, ?)`,
 			time.Now(), data.Temperature, data.Humidity, data.CO2, data.NH3, data.NOx)
 		if err != nil {
-			logger.Printf("DB ERROR: %v", err)
+			logger.Printf("FATAL - DB ERROR: %v", err)
 		}
 
-		logger.Println("Data written to DB")
+		logger.Println("INFO - Data written to DB")
 		time.Sleep(30 * time.Minute)
 	}
 }
