@@ -75,6 +75,12 @@ func createPlot(data []SensorData, field string, output string) error {
 	line.Color = color.RGBA{R: 255, A: 255}
 	p.Add(line)
 
+	// Use custom time ticks
+	p.X.Tick.Marker = plot.TimeTicks{
+		Format: "02-01-2006 15:04",
+	}
+
+	// Save the plot
 	if err := p.Save(10*vg.Inch, 5*vg.Inch, output); err != nil {
 		return err
 	}
@@ -83,8 +89,8 @@ func createPlot(data []SensorData, field string, output string) error {
 
 func createCombinedPlot(data []SensorData, output string) error {
 	fields := []struct {
-		Name  string
-		Color color.RGBA
+		Name    string
+		Color   color.RGBA
 		Extract func(SensorData) float64
 	}{
 		{"Temperature", color.RGBA{R: 255, A: 255}, func(d SensorData) float64 { return d.Temperature }},
@@ -118,6 +124,12 @@ func createCombinedPlot(data []SensorData, output string) error {
 
 	p.Legend.Top = true
 
+	// Use custom time ticks
+	p.X.Tick.Marker = plot.TimeTicks{
+		Format: "02-01-2006 15:04",
+	}
+
+	// Save the plot
 	if err := p.Save(15*vg.Inch, 10*vg.Inch, output); err != nil {
 		return err
 	}
