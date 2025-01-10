@@ -57,6 +57,7 @@ func discoverHost() (string, error) {
 }
 
 func main() {
+	var failures int =0
 	// Flags
 	debug := flag.Bool("debug", false, "Enable debug logging")
 	host := flag.String("host", "", "API server host. If not provided data_logger will look in your network for a compatible device.")
@@ -75,14 +76,19 @@ func main() {
 	}
 
 	// Discover host if not provided
-	if *host == "" {
+	if (*host == "" || failures > 4){
+		failures=0
 		logger.Println("INFO - No host provided, listening for UDP packets")
-		hostAddr, err := discoverHost()
-		if err != nil {
-			logger.Fatalf("FATAL - Failed to discover host: %v", err)
+		var err error = fmt.Errorf("initial error to loop")
+		for (err != nil) {
+			var hostAddr string
+			hostAddr, err = discoverHost()
+			if err != nil {
+				logger.Printf("WARNING - Failed to discover host: %v", err)
+			}
+			*host = hostAddr
+			logger.Printf("INFO - Discovered host: %s", *host)
 		}
-		*host = hostAddr
-		logger.Printf("INFO - Discovered host: %s", *host)
 	}
 
 	// SQLite3 setup
@@ -111,6 +117,7 @@ func main() {
 		if err != nil {
 			logger.Printf("FATAL - CONNECTION TO WEBSERVER FAILED: %v", err)
 			time.Sleep(3 * time.Minute)
+			failures=failures+1
 			continue
 		}
 		defer resp.Body.Close()
