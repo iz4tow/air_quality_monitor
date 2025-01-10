@@ -1,4 +1,3 @@
-// First Program: API Logger
 package main
 
 import (
@@ -26,26 +25,41 @@ type SensorData struct {
 	NOx         float64 `json:"nox"`
 }
 
-func discoverDevices() ([]string, error) {
-	// Simulate discovering devices on the network
-	// Replace with actual network discovery logic if needed
-	interfaces, err := net.Interfaces()
+func discoverHost() (string, error) {
+	conn, err := net.ListenPacket("udp", ":8888")
 	if err != nil {
-		return nil, err
+		return "", fmt.Errorf("failed to listen for UDP packets: %v", err)
 	}
-	var devices []string
-	for _, iface := range interfaces {
-		if strings.HasPrefix(iface.HardwareAddr.String(), "34:94:54") {
-			devices = append(devices, iface.Name)
+	defer conn.Close()
+
+	buf := make([]byte, 1024)
+	deadline := time.Now().Add(60 * time.Second)
+	err = conn.SetReadDeadline(deadline)
+	if err != nil {
+		return "", fmt.Errorf("failed to set read deadline: %v", err)
+	}
+
+	for {
+		n, _, err := conn.ReadFrom(buf)
+		if err != nil {
+			if os.IsTimeout(err) {
+				return "", fmt.Errorf("no UDP packets received within 60 seconds")
+			}
+			return "", fmt.Errorf("error reading UDP packet: %v", err)
+		}
+
+		message := string(buf[:n])
+		if strings.HasPrefix(message, "Franco-AQM:") {
+			host := strings.TrimSpace(strings.TrimPrefix(message, "Franco-AQM:"))
+			return host, nil
 		}
 	}
-	return devices, nil
 }
 
 func main() {
 	// Flags
 	debug := flag.Bool("debug", false, "Enable debug logging")
-	host := flag.String("host", "192.168.1.100", "API server host")
+	host := flag.String("host", "", "API server host. If not provided data_logger will look in your network for a compatible device.")
 	flag.Parse()
 
 	// Logger setup
@@ -58,6 +72,17 @@ func main() {
 
 	if *debug {
 		logger = log.New(io.MultiWriter(os.Stdout, logFile), "", log.LstdFlags)
+	}
+
+	// Discover host if not provided
+	if *host == "" {
+		logger.Println("INFO - No host provided, listening for UDP packets")
+		hostAddr, err := discoverHost()
+		if err != nil {
+			logger.Fatalf("FATAL - Failed to discover host: %v", err)
+		}
+		*host = hostAddr
+		logger.Printf("INFO - Discovered host: %s", *host)
 	}
 
 	// SQLite3 setup
@@ -74,7 +99,7 @@ func main() {
 		co2 REAL,
 		nh3 REAL,
 		nox REAL
-	)`) 
+	)`)
 	if err != nil {
 		logger.Fatalf("DB ERROR: %v", err)
 	}
@@ -99,7 +124,7 @@ func main() {
 
 		var data SensorData
 		if err := json.Unmarshal(body, &data); err != nil {
-			logger.Printf("FATAL -  Failed to parse JSON: %v", err)
+			logger.Printf("FATAL - Failed to parse JSON: %v", err)
 			time.Sleep(1 * time.Minute)
 			continue
 		}

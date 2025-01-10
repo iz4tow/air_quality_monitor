@@ -31,6 +31,8 @@ Arduino Wifi will reconnect automatically in case of connection lost.
 ## Server
 ### Data Logger
 Save data to a sqlite3 file
+It is capable to look for Arduino UNO WIFI R2 with this airmon.ino sketch running on your local network.
+
 #### Compile
 ```
 go build --trimpath data_logger.go
@@ -42,9 +44,13 @@ Usage of ./data_logger:
   -debug
     	Enable debug logging
   -host string
-    	API server host (default "192.168.1.100")
+    	API server host. If not provided data_logger will look in your network for a compatible device.
 ```
-Normal run
+Normal run with UDP lookup
+```
+./data_logger
+```
+Normal run with known host
 ```
 ./data_logger -host 192.168.1.100
 ```

@@ -1,9 +1,10 @@
 #include <WiFi.h>
 #include <DHT.h>
+#include <WiFiUdp.h> // Include the WiFiUDP library
 
 // WiFi credentials
-const char* ssid = "AP_SSID";
-const char* password = "SECURE_PASSWORD";
+const char* ssid = "SSID";
+const char* password = "PASSWORD SECURE";
 
 // Define MQ135 sensor pin
 #define MQ135_PIN A0
@@ -36,9 +37,40 @@ const float HUMID_COEFF = 0.02; // Adjust based on datasheet or experiments
 // Time threshold for WiFi reconnection (in milliseconds)
 const unsigned long RECONNECT_TIMEOUT = 30000; // 30 seconds
 unsigned long lastConnectionCheck = 0;
+unsigned long lastHello = 0;
+
 
 // WiFi server on port 80
 WiFiServer server(80);
+
+// UDP broadcast settings
+WiFiUDP udp;
+const unsigned int BROADCAST_PORT = 8888; // You can choose any available port
+const String UDP_MESSAGE_PREFIX = "Franco-AQM:";
+
+void helloimhere(){
+  // Get the local IP address as a string
+  IPAddress localIP = WiFi.localIP();
+  String ipString = String(localIP[0]) + "." +
+                    String(localIP[1]) + "." +
+                    String(localIP[2]) + "." +
+                    String(localIP[3]);
+  Serial.print("IP address: ");
+  Serial.println(ipString);
+  // Prepare the UDP broadcast message
+  String udpMessage = UDP_MESSAGE_PREFIX + ipString;
+  // Determine the broadcast address
+  IPAddress broadcastIP = localIP;
+  broadcastIP[3] = 255; // Set the last octet to 255 for broadcast
+  // Send the UDP broadcast
+  udp.beginPacket(broadcastIP, BROADCAST_PORT);
+  udp.write(udpMessage.c_str());
+  udp.endPacket();
+  Serial.print("UDP broadcast sent to ");
+  Serial.print(broadcastIP);
+  Serial.print(":");
+  Serial.println(BROADCAST_PORT);
+}
 
 void wifireconnect(){
   int i=0;
@@ -52,21 +84,12 @@ void wifireconnect(){
     i++;
     if (i>15){
       Serial.println("Wifi connection failed");
-      WiFi.end();    
+      WiFi.end();
       delay(1000);
       return;  
     } 
   }
-  // Get the local IP address as a string
-  IPAddress localIP = WiFi.localIP();
-  String ipString = String(localIP[0]) + "." +
-                    String(localIP[1]) + "." +
-                    String(localIP[2]) + "." +
-                    String(localIP[3]);
-
-  Serial.print("IP address: ");
-  Serial.println(ipString);
-  return;
+  helloimhere();
 }
 
 void setup() {
@@ -80,17 +103,29 @@ void setup() {
 
   if (WiFi.status() != WL_CONNECTED) wifireconnect();
 
-  Serial.println("\nWiFi connected");
-
-
   // Start the server
   server.begin();
+  
+  // Initialize UDP (optional if only sending)
+  udp.begin(BROADCAST_PORT); // This is optional for sending only
 }
 
+int hello=0;
 void loop() {
+
+  unsigned long currentMillis = millis();
+  if (hello==0){
+    lastHello = millis();
+    hello=1;
+  } else if (currentMillis - lastHello >= RECONNECT_TIMEOUT) {
+  //send UDP packet to be discovered
+    helloimhere();
+    hello=0;
+  }
+
+
   // Check WiFi status
   if (WiFi.status() != WL_CONNECTED) {
-    unsigned long currentMillis = millis();
     if (lastConnectionCheck == 0) {
       lastConnectionCheck = currentMillis; // Initialize the timer
     } else if (currentMillis - lastConnectionCheck >= RECONNECT_TIMEOUT) {
@@ -122,7 +157,7 @@ void loop() {
 }
 
 void sendJsonResponse(WiFiClient& client) {
-  // Read temperature and humidity from DHT22 sensor
+  // Read temperature and humidity from DHT11 sensor
   float temperature = dht.readTemperature();
   float humidity = dht.readHumidity();
 
@@ -196,4 +231,3 @@ void sendNotFoundResponse(WiFiClient& client) {
   Serial.println("404 Not Found response sent:");
   Serial.println(response);
 }
-
