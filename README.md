@@ -7,6 +7,8 @@ A simple air quality monitor with Arduino UNO WIFI R2 and a Go server
 - DHT11 sensor (PIN 2)
 - MQ135 sensor (PIN A0)
 
+![Alt text](./airmon.png)
+
 ## Sensor Features
 Web server providing json data for:
 - Temperature C
