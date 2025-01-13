@@ -23,6 +23,8 @@ type SensorData struct {
 	CO2         float64 `json:"co2"`
 	NH3         float64 `json:"nh3"`
 	NOx         float64 `json:"nox"`
+	Dust25      float64 `jspn: PM2.5`
+	Dust10      float64 `json: PM10`
 }
 
 func discoverHost() (string, error) {
@@ -104,7 +106,9 @@ func main() {
 		humidity REAL,
 		co2 REAL,
 		nh3 REAL,
-		nox REAL
+		nox REAL,
+		pm25 REAL,
+		pm10 REAL
 	)`)
 	if err != nil {
 		logger.Fatalf("DB ERROR: %v", err)
@@ -137,8 +141,8 @@ func main() {
 		}
 		logger.Printf("INFO - Data received: %+v", data)
 
-		_, err = db.Exec(`INSERT INTO sensor_data (timestamp, temperature, humidity, co2, nh3, nox) VALUES (?, ?, ?, ?, ?, ?)`,
-			time.Now(), data.Temperature, data.Humidity, data.CO2, data.NH3, data.NOx)
+		_, err = db.Exec(`INSERT INTO sensor_data (timestamp, temperature, humidity, co2, nh3, nox, pm25, pm10) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+			time.Now(), data.Temperature, data.Humidity, data.CO2, data.NH3, data.NOx, data.Dust25, data.Dust10)
 		if err != nil {
 			logger.Printf("FATAL - DB ERROR: %v", err)
 		}
