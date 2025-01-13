@@ -1,0 +1,12 @@
+2025/01/13 20:53:11 INFO - No host provided, listening for UDP packets
+2025/01/13 20:53:32 INFO - Discovered host: 192.168.18.108
+2025/01/13 20:53:32 DB ERROR: Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub
+2025/01/13 20:53:35 INFO - No host provided, listening for UDP packets
+2025/01/13 20:54:02 INFO - Discovered host: 192.168.18.108
+2025/01/13 20:54:02 DB ERROR: Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub
+2025/01/13 20:55:07 INFO - No host provided, listening for UDP packets
+2025/01/13 20:55:32 INFO - Discovered host: 192.168.18.108
+2025/01/13 20:55:32 INFO - Starting program
+2025/01/13 20:55:32 INFO - Fetching data from API
+2025/01/13 20:55:32 INFO - Data received: {Temperature:16.6 Humidity:76.8 CO2:955.99 NH3:1.03 NOx:0.19 Dust25:0 Dust10:0}
+2025/01/13 20:55:32 INFO - Data written to DB
