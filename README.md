@@ -4,9 +4,9 @@ A simple air quality monitor with Arduino UNO WIFI R2 and a Go server
 
 ## Hardware
 - Arduino UNO WIFI R2
-- DHT11 sensor (PIN 2)
+- DHT11 sensor (PIN 2) - optional (without T=20 H=50)
 - MQ135 sensor (PIN A0)
-- SDS011 PM sensor (RX -> TX-PIN 1 , TX -> RX-PIN 0 )
+- SDS011 PM sensor (RX -> TX-PIN 1 , TX -> RX-PIN 0) - optional
 
 ![Alt text](./airmon.png)
 

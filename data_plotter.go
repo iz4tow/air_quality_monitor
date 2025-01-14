@@ -22,6 +22,8 @@ type SensorData struct {
 	CO2         float64
 	NH3         float64
 	NOx         float64
+	PM25         float64
+	PM10         float64
 }
 
 func fetchData(db *sql.DB, start, end time.Time) ([]SensorData, error) {
@@ -63,6 +65,10 @@ func createPlot(data []SensorData, field string, output string) error {
 			yValue = record.NH3
 		case "NOx":
 			yValue = record.NOx
+		case "PM2.5":
+			yValue = record.PM25
+		case "PM10":
+			yValue = record.PM10
 		}
 		points[i].X = timeValue
 		points[i].Y = yValue
@@ -98,6 +104,8 @@ func createCombinedPlot(data []SensorData, output string) error {
 		{"CO2", color.RGBA{G: 255, A: 255}, func(d SensorData) float64 { return d.CO2 }},
 		{"NH3", color.RGBA{R: 128, G: 0, B: 128, A: 255}, func(d SensorData) float64 { return d.NH3 }},
 		{"NOx", color.RGBA{R: 0, G: 128, B: 128, A: 255}, func(d SensorData) float64 { return d.NOx }},
+		{"PM25", color.RGBA{R: 224, G: 194, B: 85, A: 255}, func(d SensorData) float64 { return d.PM25 }},
+		{"PM10", color.RGBA{R: 242, G: 92, B: 2, A: 255}, func(d SensorData) float64 { return d.PM10 }},
 	}
 
 	p := plot.New()
