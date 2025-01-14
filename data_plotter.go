@@ -27,7 +27,7 @@ type SensorData struct {
 }
 
 func fetchData(db *sql.DB, start, end time.Time) ([]SensorData, error) {
-	rows, err := db.Query(`SELECT timestamp, temperature, humidity, co2, nh3, nox FROM sensor_data WHERE timestamp BETWEEN ? AND ?`, start, end)
+	rows, err := db.Query(`SELECT timestamp, temperature, humidity, co2, nh3, nox, pm25, pm10 FROM sensor_data WHERE timestamp BETWEEN ? AND ?`, start, end)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func fetchData(db *sql.DB, start, end time.Time) ([]SensorData, error) {
 	var data []SensorData
 	for rows.Next() {
 		var record SensorData
-		if err := rows.Scan(&record.Timestamp, &record.Temperature, &record.Humidity, &record.CO2, &record.NH3, &record.NOx); err != nil {
+		if err := rows.Scan(&record.Timestamp, &record.Temperature, &record.Humidity, &record.CO2, &record.NH3, &record.NOx,&record.PM25, &record.PM10); err != nil {
 			return nil, err
 		}
 		data = append(data, record)
@@ -192,7 +192,7 @@ func main() {
 			log.Fatalf("Failed to create combined plot: %v", err)
 		}
 	} else if *field == "all" {
-		fields := []string{"Temperature", "Humidity", "CO2", "NH3", "NOx"}
+		fields := []string{"Temperature", "Humidity", "CO2", "NH3", "NOx", "PM2.5", "PM10"}
 		for _, f := range fields {
 			outputFile := fmt.Sprintf("%s_%s.png", *output, f)
 			if err := createPlot(data, f, outputFile); err != nil {
