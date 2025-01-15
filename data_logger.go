@@ -23,8 +23,8 @@ type SensorData struct {
 	CO2         float64 `json:"co2"`
 	NH3         float64 `json:"nh3"`
 	NOx         float64 `json:"nox"`
-	Dust25      float64 `jspn: PM2.5`
-	Dust10      float64 `json: PM10`
+	Dust25      float64 `json:"pm25"`
+	Dust10      float64 `json:"pm10"`
 }
 
 func discoverHost() (string, error) {
@@ -59,7 +59,7 @@ func discoverHost() (string, error) {
 }
 
 func main() {
-	var failures int =0
+	var failures int
 	// Flags
 	debug := flag.Bool("debug", false, "Enable debug logging")
 	host := flag.String("host", "", "API server host. If not provided data_logger will look in your network for a compatible device.")
@@ -78,11 +78,11 @@ func main() {
 	}
 
 	// Discover host if not provided
-	if (*host == "" || failures > 4){
-		failures=0
+	if *host == "" || failures > 4 {
+		failures = 0
 		logger.Println("INFO - No host provided, listening for UDP packets")
 		var err error = fmt.Errorf("initial error to loop")
-		for (err != nil) {
+		for err != nil {
 			var hostAddr string
 			hostAddr, err = discoverHost()
 			if err != nil {
@@ -100,6 +100,7 @@ func main() {
 	}
 	defer db.Close()
 
+	// Ensure the table exists
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS sensor_data (
 		timestamp DATETIME NOT NULL,
 		temperature REAL,
@@ -114,6 +115,45 @@ func main() {
 		logger.Fatalf("DB ERROR: %v", err)
 	}
 
+	// Check for missing columns and add them
+	requiredColumns := map[string]string{
+		"temperature": "REAL",
+		"humidity":    "REAL",
+		"co2":         "REAL",
+		"nh3":         "REAL",
+		"nox":         "REAL",
+		"pm25":        "REAL",
+		"pm10":        "REAL",
+	}
+
+	rows, err := db.Query(`PRAGMA table_info(sensor_data)`)
+	if err != nil {
+		logger.Fatalf("DB ERROR: %v", err)
+	}
+	defer rows.Close()
+
+	existingColumns := map[string]bool{}
+	for rows.Next() {
+		var cid int
+		var name, ctype string
+		var notnull, pk int
+		var dfltValue sql.NullString
+		if err := rows.Scan(&cid, &name, &ctype, &notnull, &dfltValue, &pk); err != nil {
+			logger.Fatalf("DB ERROR: %v", err)
+		}
+		existingColumns[name] = true
+	}
+
+	for col, colType := range requiredColumns {
+		if !existingColumns[col] {
+			logger.Printf("INFO - Adding missing column: %s %s", col, colType)
+			_, err := db.Exec(fmt.Sprintf(`ALTER TABLE sensor_data ADD COLUMN %s %s`, col, colType))
+			if err != nil {
+				logger.Fatalf("DB ERROR: Failed to add column %s: %v", col, err)
+			}
+		}
+	}
+
 	logger.Println("INFO - Starting program")
 	for {
 		logger.Println("INFO - Fetching data from API")
@@ -121,7 +161,7 @@ func main() {
 		if err != nil {
 			logger.Printf("FATAL - CONNECTION TO WEBSERVER FAILED: %v", err)
 			time.Sleep(3 * time.Minute)
-			failures=failures+1
+			failures++
 			continue
 		}
 		defer resp.Body.Close()
