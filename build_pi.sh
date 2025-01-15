@@ -11,9 +11,9 @@ export CC=arm-linux-gnueabi-gcc; \
 CGO_ENABLED=1 go build -ldflags "-linkmode external -extldflags -static" --trimpath \
  data_logger.go
 
-curl -X GET "http://localhost:3000/api/dashboards/uid/be9yswpcby39ca" -H "Authorization: Bearer glsa_0a7GSB9AI7Dwuuc6cbQP0P0fszRrVsqO_76a78700"
-curl -X GET "http://localhost:3000/api/dashboards/uid/be9yswpcby39ca" -H "Authorization: Bearer glsa_0a7GSB9AI7Dwuuc6cbQP0P0fszRrVsqO_76a78700" > dashboard_toclean.json
-jq '.dashboard' "dashboard_toclean.json" > "dashboard.json"
+#curl -X GET "http://localhost:3000/api/dashboards/uid/be9yswpcby39ca" -H "Authorization: Bearer glsa_0a7GSB9AI7Dwuuc6cbQP0P0fszRrVsqO_76a78700"
+#curl -X GET "http://localhost:3000/api/dashboards/uid/be9yswpcby39ca" -H "Authorization: Bearer glsa_0a7GSB9AI7Dwuuc6cbQP0P0fszRrVsqO_76a78700" > dashboard_toclean.json
+#jq '.dashboard' "dashboard_toclean.json" > "dashboard.json"
 
 rm -f dashboard_toclean.json
 mv data_logger ../RPI-AQI-Hub
