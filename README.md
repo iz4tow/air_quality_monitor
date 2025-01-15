@@ -45,6 +45,7 @@ Arduino Wifi will reconnect automatically in case of connection lost.
 #### Build
 The script will create RPI-AQI-Hub.tar.gz files on ../ folder, then you have to copy it on the raspberry, unzip it and run rpi_hub_install.sh
 ```
+git clone https://github.com/iz4tow/air_quality_monitor/
 ./build-pi.sh
 scp ../RPI-AQI-Hub.tar.gz
 ssh pi@<pi IP>
