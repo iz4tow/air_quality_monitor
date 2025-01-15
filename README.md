@@ -7,6 +7,7 @@ A simple air quality monitor with Arduino UNO WIFI R2 and a Go server
 - DHT11 sensor (PIN 2) - optional (without T=20 H=50)
 - MQ135 sensor (PIN A0)
 - SDS011 PM sensor (RX -> TX-PIN 1 , TX -> RX-PIN 0) - optional
+- Raspberry PI4 or PI5 - optional (only for fully automated hub with grafana)
 
 ![Alt text](./airmon.png)
 
@@ -36,6 +37,22 @@ On the Serial Console (9600bd) you can find device IP.
 Arduino Wifi will reconnect automatically in case of connection lost.
 
 ## Server
+### Build a fully automated system for Raspberry PI 4 or 5
+#### Features:
+- data logger
+- grafana web server with graph on port 3000
+
+#### Build
+The script will create RPI-AQI-Hub.tar.gz files on ../ folder, then you have to copy it on the raspberry, unzip it and run rpi_hub_install.sh
+```
+./build-pi.sh
+scp ../RPI-AQI-Hub.tar.gz
+ssh pi@<pi IP>
+tar zxvf RPI-AQI-Hub.tar.gz
+sudo rpi_hub_install.sh
+sudo reboot
+```
+
 ### Data Logger
 Save data to a sqlite3 file
 It is capable to look for Arduino UNO WIFI R2 with this airmon.ino sketch running on your local network.
@@ -69,6 +86,7 @@ Debug (verbose logging)
 
 ### Data Plotter
 Plot graph from sqlite3 data
+
 #### Compile
 ```
 go build --trimpath data_plotter.go
@@ -76,7 +94,7 @@ go build --trimpath data_plotter.go
 
 #### How to use
 ```
-Usage of /tmp/go-build3139716189/b001/exe/data_plotter:
+Usage of ./data_plotter:
   -end string
     	End time (YYYY-MM-DD HH:MM:SS)
   -field string
