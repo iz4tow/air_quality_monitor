@@ -77,6 +77,8 @@ Usage of ./data_logger:
     	Enable debug logging
   -host string
     	API server host. If not provided data_logger will look in your network for a compatible device.
+  -interval int
+    	Interval between measurements in minutes. (default 30)
 ```
 Normal run with UDP lookup
 ```

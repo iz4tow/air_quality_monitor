@@ -63,6 +63,7 @@ func main() {
 	// Flags
 	debug := flag.Bool("debug", false, "Enable debug logging")
 	host := flag.String("host", "", "API server host. If not provided data_logger will look in your network for a compatible device.")
+	interval := flag.Int("interval", 30, "Interval between measurements in minutes.")
 	flag.Parse()
 
 	// Logger setup
@@ -188,7 +189,7 @@ func main() {
 		}
 
 		logger.Println("INFO - Data written to DB")
-		time.Sleep(30 * time.Minute)
+		time.Sleep(time.Duration(*interval) * time.Minute)
 	}
 }
 
