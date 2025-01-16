@@ -14,10 +14,14 @@ CGO_ENABLED=1 go build -ldflags "-linkmode external -extldflags -static" --trimp
 curl -X GET "http://localhost:3000/api/dashboards/uid/be9yswpcby39ca" -H "Authorization: Bearer glsa_0a7GSB9AI7Dwuuc6cbQP0P0fszRrVsqO_76a78700"
 curl -X GET "http://localhost:3000/api/dashboards/uid/be9yswpcby39ca" -H "Authorization: Bearer glsa_0a7GSB9AI7Dwuuc6cbQP0P0fszRrVsqO_76a78700" > dashboard_toclean.json
 jq '.dashboard' "dashboard_toclean.json" > "dashboard.json"
+curl -X GET "http://localhost:3000/api/dashboards/uid/fea5brmbiqyo0c" -H "Authorization: Bearer glsa_0a7GSB9AI7Dwuuc6cbQP0P0fszRrVsqO_76a78700"
+curl -X GET "http://localhost:3000/api/dashboards/uid/fea5brmbiqyo0c" -H "Authorization: Bearer glsa_0a7GSB9AI7Dwuuc6cbQP0P0fszRrVsqO_76a78700" > dashboardrt_toclean.json
+jq '.dashboard' "dashboardrt_toclean.json" > "dashboardrt.json"
 
 rm -f dashboard_toclean.json
 mv data_logger ../RPI-AQI-Hub
 cp dashboard.json ../RPI-AQI-Hub
+cp dashboardrt.json ../RPI-AQI-Hub
 cp rpi_hub_install.sh ../RPI-AQI-Hub
 
 cd ../RPI-AQI-Hub

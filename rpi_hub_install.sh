@@ -57,6 +57,7 @@ providers:
       path: /var/lib/grafana/dashboards
 EOF
 sudo cp dashboard.json /var/lib/grafana/dashboards/
+sudo cp dashboardrt.json /var/lib/grafana/dashboards/
 # Enable Grafana on boot
 sudo systemctl enable grafana-server
 grafana-cli plugins install frser-sqlite-datasource
