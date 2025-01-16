@@ -54,6 +54,13 @@ sudo rpi_hub_install.sh
 sudo reboot
 ```
 
+#### Grafana Graph
+##### Historical data
+![Alt text](./img/dashboard1.png)
+
+##### near real time gauges
+![Alt text](./img/dashboard2.png)
+
 ### Data Logger
 Save data to a sqlite3 file
 It is capable to look for Arduino UNO WIFI R2 with this airmon.ino sketch running on your local network.
