@@ -204,7 +204,7 @@ void sendJsonResponse(WiFiClient& client) {
   float dust25,dust10;
     if (pm.isOk()) {
       dust25 = pm.pm25; 
-      dust10 = pm.pm25;
+      dust10 = pm.pm10;
       Serial.print("PM2.5 = ");
       Serial.print(pm.pm25);
       Serial.print(", PM10 = ");
