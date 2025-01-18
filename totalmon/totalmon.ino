@@ -10,7 +10,7 @@ SdsDustSensor sds(rxPin,txPin);
 
 // WiFi credentials
 const char* ssid = "SSID";
-const char* password = "PASSWORD SECURE";
+const char* password = "WIFI PASSWORD";
 
 // Define MQ135 sensor pin
 #define MQ135_PIN A0

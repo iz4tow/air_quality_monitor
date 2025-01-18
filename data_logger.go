@@ -23,7 +23,7 @@ type SensorData struct {
 	CO2         float64 `json:"co2"`
 	NH3         float64 `json:"nh3"`
 	NOx         float64 `json:"nox"`
-	Dust25      float64 `json:"pm25"`
+	Dust25      float64 `json:"pm2.5"`
 	Dust10      float64 `json:"pm10"`
 }
 
