@@ -6,6 +6,7 @@ A simple air quality monitor with Arduino UNO WIFI R2 and a Go server
 - Arduino UNO WIFI R2
 - DHT11 sensor (PIN 2) - optional (without T=20 H=50)
 - MQ135 sensor (PIN A0)
+- MQ7 sensor (PIN A1) 
 - SDS011 PM sensor (RX -> TX-PIN 1 , TX -> RX-PIN 0) - optional
 - Raspberry PI4 or PI5 - optional (only for fully automated hub with grafana)
 
@@ -18,6 +19,7 @@ Web server providing json data for:
 - CO2 ppm
 - NH3 ppm
 - NOx ppm
+- CO ppm
 - PM 2.5
 - PM 10
 
@@ -30,7 +32,8 @@ example of json response:
 	"nh3": 0.65,
 	"nox": 0.13,
         "PM2.5": 13,
-        "PM10:": 130
+        "PM10:": 130,
+	"CO": 10
 }
 ```
 On the Serial Console (9600bd) you can find device IP.
