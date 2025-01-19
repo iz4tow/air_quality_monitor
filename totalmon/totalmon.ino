@@ -2,6 +2,7 @@
 #include <DHT.h>
 #include <WiFiUdp.h> // Include the WiFiUDP library
 #include "SdsDustSensor.h"
+#include "MQ7.h"
 
 int rxPin = 0;
 int txPin = 1;
@@ -10,10 +11,14 @@ SdsDustSensor sds(rxPin,txPin);
 
 // WiFi credentials
 const char* ssid = "SSID";
-const char* password = "WIFI PASSWORD";
+const char* password = "PASSWORD";
 
 // Define MQ135 sensor pin
 #define MQ135_PIN A0
+
+//Define MQ7 values
+MQ7 mq7(A1,3.5);
+
 
 // Define DHT22 sensor pin and type
 #define DHTPIN 2
@@ -88,7 +93,7 @@ void wifireconnect(){
     delay(1000);
     Serial.print(".");
     i++;
-    if (i>15){
+    if (i>20){
       Serial.println("Wifi connection failed");
       WiFi.end();
       delay(1000);
@@ -198,6 +203,9 @@ void sendJsonResponse(WiFiClient& client) {
   float ppmCO2 = PPM_CO2_BASE * pow(compensatedRatio, CO2_SLOPE);
   float ppmNH3 = PPM_NH3_BASE * pow(compensatedRatio, NH3_SLOPE);
   float ppmNOx = PPM_NOX_BASE * pow(compensatedRatio, NOX_SLOPE);
+
+  // Read CO concentration from MQ7
+  float ppmCO = mq7.getPPM();
   
   //dust data
   PmResult pm = sds.readPm();
@@ -205,12 +213,6 @@ void sendJsonResponse(WiFiClient& client) {
     if (pm.isOk()) {
       dust25 = pm.pm25; 
       dust10 = pm.pm10;
-      Serial.print("PM2.5 = ");
-      Serial.print(pm.pm25);
-      Serial.print(", PM10 = ");
-      Serial.println(pm.pm10);
-      //if you want to just print the measured values, you can use toString() method as well
-      Serial.println(pm.toString());
   }   else {
     //notice that loop delay is set to .5s
     Serial.print("could not read values from PM sensor");
@@ -225,7 +227,8 @@ void sendJsonResponse(WiFiClient& client) {
   jsonResponse += "\"nh3\": " + String(ppmNH3, 2) + ",";
   jsonResponse += "\"nox\": " + String(ppmNOx, 2) + ",";
   jsonResponse += "\"PM2.5\": " + String(dust25, 2) + ",";
-  jsonResponse += "\"PM10\": " + String(dust10, 2);
+  jsonResponse += "\"PM10\": " + String(dust10, 2)+",";
+  jsonResponse += "\"CO\": " + String(ppmCO,2);
   jsonResponse += "}";
 
   // Send HTTP response
