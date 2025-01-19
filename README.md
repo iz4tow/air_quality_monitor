@@ -61,7 +61,7 @@ sudo reboot
 ##### Historical data
 ![Alt text](./img/dashboard1.png)
 
-##### near real time gauges
+##### Near real time gauges
 ![Alt text](./img/dashboard2.png)
 
 ### Data Logger
