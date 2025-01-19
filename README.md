@@ -44,6 +44,7 @@ Arduino Wifi will reconnect automatically in case of connection lost.
 #### Features:
 - data logger
 - grafana web server with graph on port 3000
+- alarm whatsapp sender for CO, TEMPERATURE and PM2.5 levels
 
 #### Build
 The script will create RPI-AQI-Hub.tar.gz files on ../ folder, then you have to copy it on the raspberry, unzip it and run rpi_hub_install.sh
@@ -55,6 +56,11 @@ ssh pi@<pi IP>
 tar zxvf RPI-AQI-Hub.tar.gz
 sudo rpi_hub_install.sh
 sudo reboot
+
+#OPTIONAL TO CONFIGURE WHATSAPP
+cd /opt/airmon/whatsapp
+./send_whatsapp test 393334455666
+#THEN SCAN QR CODE FROM YOUR PHONE ON WHATSAPP LINK-DEVICE 
 ```
 
 #### Grafana Graph
