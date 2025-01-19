@@ -64,6 +64,7 @@ func main() {
 	debug := flag.Bool("debug", false, "Enable debug logging")
 	host := flag.String("host", "", "API server host. If not provided data_logger will look in your network for a compatible device.")
 	interval := flag.Int("interval", 30, "Interval between measurements in minutes.")
+	wa_contact := flag.String("number", "", "Whatsapp contact number whitout +, es 393312345654")
 	flag.Parse()
 
 	// Logger setup
@@ -123,7 +124,7 @@ func main() {
 		
 		if data.CO > 20.0 {
 			logger.Printf("ALARM - CO CRITICAL LEVEL!!!")
-			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO CO CRITICO")
+			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO CO CRITICO", *wa_contact)
 			_, err := cmd.CombinedOutput()
 			if err != nil {
 			fmt.Println("Error:", err)
@@ -131,7 +132,7 @@ func main() {
 		}
 		if data.Dust25 > 100.0 {
 			logger.Printf("ALARM - PM2.5 CRITICAL LEVEL!!!")
-			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO PM CRITICO")
+			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO PM CRITICO", *wa_contact)
 			_, err := cmd.CombinedOutput()
 			if err != nil {
 			fmt.Println("Error:", err)
@@ -139,7 +140,7 @@ func main() {
 		}
 		if data.Temperature > 30.0 {
 			logger.Printf("ALARM - TEMP CRITICAL LEVEL!!!")
-			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO TEMPERATURA CRITICO")
+			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO TEMPERATURA CRITICO", *wa_contact)
 			_, err := cmd.CombinedOutput()
 			if err != nil {
 			fmt.Println("Error:", err)

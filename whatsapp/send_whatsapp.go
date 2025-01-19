@@ -21,6 +21,7 @@ import (
 
 func main() {
 	msg:=os.Args[1]
+	wa_contact:=os.Args[2]
 	dbLog := waLog.Stdout("Database", "INFO", true)
 	container, err := sqlstore.New("sqlite3", "file:accounts.db?_foreign_keys=on", dbLog)
 	if err != nil {
@@ -59,7 +60,7 @@ func main() {
 	}
 
 	// Send a "Hello" message using waE2E.Message
-	recipientJID := types.NewJID("393473055801", types.DefaultUserServer) //types.DefaultUserServer automatically adds @s.whatsapp.net to the JID.
+	recipientJID := types.NewJID(wa_contact, types.DefaultUserServer) //types.DefaultUserServer automatically adds @s.whatsapp.net to the JID. es 393334455666
 
 	// Construct the message using waE2E.Message
 	textMessage := &waE2E.Message{
