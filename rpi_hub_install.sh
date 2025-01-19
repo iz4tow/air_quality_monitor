@@ -20,6 +20,21 @@ WantedBy=multi-user.target
 EOF
 sudo systemctl enable --now airmon
 
+sudo tee /etc/systemd/system/airmon_alarm.service <<EOF
+[Unit]
+Description=Franco Air Quality Monitor Alarm
+After=network.target auditd.service
+
+[Service]
+WorkingDirectory=/opt/airmon/
+ExecStart=/opt/airmon/whatsapp_logger
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl enable airmon_alarm
+
 #Install Grafana
 sudo mkdir -p /etc/apt/keyrings/
 wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null
@@ -64,3 +79,7 @@ grafana-cli plugins install frser-sqlite-datasource
 # Restart Grafana to apply provisioning
 sudo systemctl restart grafana-server
 echo "System installed and configured successfully!"
+echo "To enable alarm notification:"
+echo "sudo su"
+echo "cd /opt/airmon/whatsapp"
+echo "./send_whatsapp test"
