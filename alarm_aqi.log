@@ -1,1 +1,21 @@
 2025/01/20 06:17:38 INFO - No host provided, listening for UDP packets
+2025/01/20 18:20:52 INFO - No host provided, listening for UDP packets
+2025/01/20 18:20:52 INFO - host: 192.168.18.108
+2025/01/20 18:20:52 INFO - Starting program
+2025/01/20 18:20:52 INFO - Fetching data from API
+2025/01/20 18:20:52 FATAL - CONNECTION TO WEBSERVER FAILED: Get "http:///api/data": http: no Host in request URL
+2025/01/20 18:20:56 INFO - No host provided, listening for UDP packets
+2025/01/20 18:20:56 INFO - host: 192.168.18.108
+2025/01/20 18:20:56 INFO - Starting program
+2025/01/20 18:20:56 INFO - Fetching data from API
+2025/01/20 18:20:56 FATAL - CONNECTION TO WEBSERVER FAILED: Get "http:///api/data": http: no Host in request URL
+2025/01/20 18:21:21 INFO - No host provided, listening for UDP packets
+2025/01/20 18:21:21 INFO - host: 192.168.18.108
+2025/01/20 18:21:21 INFO - Starting program
+2025/01/20 18:21:21 INFO - Fetching data from API
+2025/01/20 18:21:21 FATAL - CONNECTION TO WEBSERVER FAILED: Get "http:///api/data": http: no Host in request URL
+2025/01/20 18:22:06 INFO - No host provided, listening for UDP packets
+2025/01/20 18:22:06 INFO - host: 192.168.18.108
+2025/01/20 18:22:06 INFO - Starting program
+2025/01/20 18:22:06 INFO - Fetching data from API
+2025/01/20 18:22:06 FATAL - Failed to parse JSON: invalid character 'N' looking for beginning of value

@@ -1,0 +1,6 @@
+2025/01/20 18:18:02 INFO - No host provided, listening for UDP packets
+2025/01/20 18:18:05 INFO - No host provided, listening for UDP packets
+2025/01/20 18:18:08 INFO - Discovered host: 192.168.18.108
+2025/01/20 18:18:08 INFO - Starting program
+2025/01/20 18:18:08 INFO - Fetching data from API
+2025/01/20 18:18:09 FATAL - Failed to parse JSON: invalid character 'N' looking for beginning of value

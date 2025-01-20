@@ -1,8 +1,10 @@
 #!/bin/bash
 
 #install airmon
-sudo mkdir -p /opt/airmon
+sudo mkdir -p /opt/airmon/whatsapp
 sudo mv data_logger /opt/airmon
+sudo mv whatsapp_logger /opt/airmon
+sudo mv whatsapp/* /opt/airmon/whatsapp/
 
 #Create airmon service
 sudo tee /etc/systemd/system/airmon.service <<EOF
@@ -72,9 +74,12 @@ while true; do
 sudo tee /etc/systemd/system/airmon_alarm.service <<EOF
 [Unit]
 Description=Franco Air Quality Monitor Alarm
-After=network.target auditd.service
+After=airmon.service
+Requires=airmon.service
 
 [Service]
+TimeoutStartSec=100
+RestartSec=60
 WorkingDirectory=/opt/airmon/
 ExecStart=/opt/airmon/whatsapp_logger -number $whats_number
 Restart=on-failure
@@ -82,16 +87,13 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 EOF
-cd /opt/airmon/whatsapp
+cd /opt/airmon
 echo "Please scan QR code with WhatsApp on your phone to link this device"
-whatsapp/whatsapp_login
+whatsapp/send_whatsapp test_message $whats_number
 sudo systemctl enable --now airmon_alarm
 echo "System installed and configured successfully!"
-beak
-
-
-
 sudo systemctl enable airmon_alarm
+break
             ;;
             
 
@@ -106,9 +108,12 @@ echo "To install alarm service:"
 echo "sudo tee /etc/systemd/system/airmon_alarm.service <<EOF"
 echo "[Unit]"
 echo "Description=Franco Air Quality Monitor Alarm"
-echo "After=network.target auditd.service"
+echo "After=airmon.service"
+echo "Requires=airmon.service"
 echo
 echo "[Service]"
+echo "TimeoutStartSec=100"
+echo "RestartSec=60"
 echo "WorkingDirectory=/opt/airmon/"
 echo "ExecStart=/opt/airmon/whatsapp_logger -number <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>"
 echo "Restart=on-failure"
@@ -125,4 +130,4 @@ break
             echo "Invalid input. Please enter Y or N."
             ;;
     esac
-
+done

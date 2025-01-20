@@ -7,11 +7,10 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"os/exec"
-	"strings"
+	"bufio"
 	"time"
 	"strconv"
 
@@ -28,36 +27,6 @@ type SensorData struct {
 	CO          float64 `json:"CO"`
 }
 
-func discoverHost() (string, error) {
-	conn, err := net.ListenPacket("udp", ":8888")
-	if err != nil {
-		return "", fmt.Errorf("failed to listen for UDP packets: %v", err)
-	}
-	defer conn.Close()
-
-	buf := make([]byte, 1024)
-	deadline := time.Now().Add(60 * time.Second)
-	err = conn.SetReadDeadline(deadline)
-	if err != nil {
-		return "", fmt.Errorf("failed to set read deadline: %v", err)
-	}
-
-	for {
-		n, _, err := conn.ReadFrom(buf)
-		if err != nil {
-			if os.IsTimeout(err) {
-				return "", fmt.Errorf("no UDP packets received within 60 seconds")
-			}
-			return "", fmt.Errorf("error reading UDP packet: %v", err)
-		}
-
-		message := string(buf[:n])
-		if strings.HasPrefix(message, "Franco-AQM:") {
-			host := strings.TrimSpace(strings.TrimPrefix(message, "Franco-AQM:"))
-			return host, nil
-		}
-	}
-}
 
 func main() {
 	var failures int
@@ -80,21 +49,23 @@ func main() {
 		logger = log.New(io.MultiWriter(os.Stdout, logFile), "", log.LstdFlags)
 	}
 
-	// Discover host if not provided
+	// Read host in pipefile if not provided
 	if *host == "" || failures > 4 {
 		failures = 0
 		logger.Println("INFO - No host provided, listening for UDP packets")
-		var err error = fmt.Errorf("initial error to loop")
-		for err != nil {
-			var hostAddr string
-			hostAddr, err = discoverHost()
-			if err != nil {
-				logger.Printf("WARNING - Failed to discover host: %v", err)
-			}
-			*host = hostAddr
-			logger.Printf("INFO - Discovered host: %s", *host)
+		pipe, err := os.Open("/tmp/airmonpipe")
+		if err != nil {
+			log.Fatalf("Error opening pipe: %v", err)
+			return
 		}
+		defer pipe.Close()
+		reader := bufio.NewReader(pipe)
+		message, _ := reader.ReadString('\n')
+		*host=message
+		logger.Println("INFO - host:", *host)
 	}
+
+
 	
 	logger.Println("INFO - Starting program")
 	for {

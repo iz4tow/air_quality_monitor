@@ -13,6 +13,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -94,6 +95,24 @@ func main() {
 			logger.Printf("INFO - Discovered host: %s", *host)
 		}
 	}
+	
+	//create a PIPEFILE to send address to whatsapp logger program
+	pipePath := "/tmp/airmonpipe"
+	file, err := os.Create(pipePath)
+	if err != nil {
+		log.Fatalf("Failed to create pipefile: %v", err)
+	}
+	// Close the file after creation
+	err = file.Close()
+	if err != nil {
+		log.Fatalf("Failed to close pipefile: %v", err)
+	}
+	pipe, err := os.OpenFile(pipePath, os.O_WRONLY, os.ModeNamedPipe)
+	if err != nil {
+		fmt.Println("Error opening pipe:", err)
+	}
+	defer pipe.Close()
+	pipe.WriteString(*host)
 
 	// SQLite3 setup
 	db, err := sql.Open("sqlite3", "sensor_data.db")
