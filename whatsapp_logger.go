@@ -64,7 +64,7 @@ func main() {
 	// Flags
 	debug := flag.Bool("debug", false, "Enable debug logging")
 	host := flag.String("host", "", "API server host. If not provided data_logger will look in your network for a compatible device.")
-	interval := flag.Int("interval", 30, "Interval between measurements in minutes.")
+	interval := flag.Int("interval", 5, "Interval between measurements in minutes.")
 	wa_contact := flag.String("number", "", "Whatsapp contact number whitout +, es 393312345654")
 	flag.Parse()
 
