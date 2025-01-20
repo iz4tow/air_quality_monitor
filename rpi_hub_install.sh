@@ -101,23 +101,23 @@ echo "To enable alarm notification:"
 echo "sudo su"
 echo "cd /opt/airmon"
 echo "whatsapp/whatsapp_login"
-echo.
+echo
 echo "To install alarm service:"
 echo "sudo tee /etc/systemd/system/airmon_alarm.service <<EOF"
 echo "[Unit]"
 echo "Description=Franco Air Quality Monitor Alarm"
 echo "After=network.target auditd.service"
-echo.
+echo
 echo "[Service]"
 echo "WorkingDirectory=/opt/airmon/"
 echo "ExecStart=/opt/airmon/whatsapp_logger -number <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>"
 echo "Restart=on-failure"
-echo.
+echo
 echo "[Install]"
 echo "WantedBy=multi-user.target"
 echo "EOF"
 echo "sudo systemctl enable --now airmon_alarm"
-echo.
+echo
 echo "System installed and configured successfully!"
 break
             ;;

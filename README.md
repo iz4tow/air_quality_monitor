@@ -58,10 +58,26 @@ tar zxvf RPI-AQI-Hub.tar.gz
 sudo rpi_hub_install.sh
 sudo reboot
 
-#OPTIONAL TO CONFIGURE WHATSAPP
-cd /opt/airmon/whatsapp
-./send_whatsapp test 393334455666
+#OPTIONAL TO CONFIGURE WHATSAPP IF SKIPPED DURING INSTALLATION
+sudo su
+cd /opt/airmon
+whatsapp/whatsapp_login
 #THEN SCAN QR CODE FROM YOUR PHONE ON WHATSAPP LINK-DEVICE 
+
+sudo tee /etc/systemd/system/airmon_alarm.service <<EOF
+[Unit]
+Description=Franco Air Quality Monitor Alarm
+After=network.target auditd.service
+
+[Service]
+WorkingDirectory=/opt/airmon/
+ExecStart=/opt/airmon/whatsapp_logger -number <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl enable --now airmon_alarm
 ```
 
 #### Grafana Graph
