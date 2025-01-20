@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+	"strconv"
 
 )
 
@@ -123,24 +124,63 @@ func main() {
 		logger.Printf("INFO - Data received: %+v", data)
 		
 		if data.CO > 20.0 {
+			level:=strconv.FormatFloat(data.CO, 'f', 2, 64) // 'f' format, 2 decimal places
 			logger.Printf("ALARM - CO CRITICAL LEVEL!!!")
-			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO CO CRITICO", *wa_contact)
+			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO CO CRITICO: "+level+"ppm", *wa_contact)
+			_, err := cmd.CombinedOutput()
+			if err != nil {
+			fmt.Println("Error:", err)
+			}
+		}
+		if data.CO2 > 1000.0 {
+			level:=strconv.FormatFloat(data.CO2, 'f', 2, 64) // 'f' format, 2 decimal places
+			logger.Printf("ALARM - CO2 CRITICAL LEVEL!!!")
+			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO CO2 CRITICO: "+level+"ppm", *wa_contact)
+			_, err := cmd.CombinedOutput()
+			if err != nil {
+			fmt.Println("Error:", err)
+			}
+		}
+		if data.NOx > 1.5 {
+			level:=strconv.FormatFloat(data.NOx, 'f', 2, 64) // 'f' format, 2 decimal places
+			logger.Printf("ALARM - NOx CRITICAL LEVEL!!!")
+			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO NOx CRITICO: "+level+"ppm", *wa_contact)
 			_, err := cmd.CombinedOutput()
 			if err != nil {
 			fmt.Println("Error:", err)
 			}
 		}
 		if data.Dust25 > 100.0 {
+			level:=strconv.FormatFloat(data.Dust25, 'f', 2, 64) // 'f' format, 2 decimal places
 			logger.Printf("ALARM - PM2.5 CRITICAL LEVEL!!!")
-			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO PM CRITICO", *wa_contact)
+			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO PM2.5 CRITICO: "+level+"ppm", *wa_contact)
+			_, err := cmd.CombinedOutput()
+			if err != nil {
+			fmt.Println("Error:", err)
+			}
+		}
+		if data.Dust10 > 100.0 {
+			level:=strconv.FormatFloat(data.Dust10, 'f', 2, 64) // 'f' format, 2 decimal places
+			logger.Printf("ALARM - PM10 CRITICAL LEVEL!!!")
+			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO PM10 CRITICO: "+level+"ppm", *wa_contact)
 			_, err := cmd.CombinedOutput()
 			if err != nil {
 			fmt.Println("Error:", err)
 			}
 		}
 		if data.Temperature > 30.0 {
+			level:=strconv.FormatFloat(data.Temperature, 'f', 2, 64) // 'f' format, 2 decimal places
 			logger.Printf("ALARM - TEMP CRITICAL LEVEL!!!")
-			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO TEMPERATURA CRITICO", *wa_contact)
+			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO TEMPERATURA CRITICO: "+level+"C", *wa_contact)
+			_, err := cmd.CombinedOutput()
+			if err != nil {
+			fmt.Println("Error:", err)
+			}
+		}
+		if (data.Humidity < 30.0 || data.Humidity > 80.0) {
+			level:=strconv.FormatFloat(data.Humidity, 'f', 2, 64) // 'f' format, 2 decimal places
+			logger.Printf("ALARM - HUM CRITICAL LEVEL!!!")
+			cmd := exec.Command("whatsapp/send_whatsapp", "LIVELLO UMIDITA' CRITICO: "+level+"%", *wa_contact)
 			_, err := cmd.CombinedOutput()
 			if err != nil {
 			fmt.Println("Error:", err)
