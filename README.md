@@ -46,6 +46,7 @@ Arduino Wifi will reconnect automatically in case of connection lost.
 - data logger
 - grafana web server with graph on port 3000
 - alarm whatsapp sender for CO, TEMPERATURE and PM2.5 levels
+- chatbot
 
 #### Build
 The script will create RPI-AQI-Hub.tar.gz files on ../ folder, then you have to copy it on the raspberry, unzip it and run rpi_hub_install.sh
@@ -91,7 +92,7 @@ Requires=airmon.service
 TimeoutStartSec=100
 RestartSec=60
 WorkingDirectory=/opt/airmon/
-ExecStart=/opt/airmon/whatsapp/whatsapp_room <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>
+ExecStart=/opt/airmon/whatsapp/whatsapp_room -number <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>
 Restart=on-failure
 
 [Install]
@@ -99,6 +100,34 @@ WantedBy=multi-user.target
 EOF
 sudo systemctl enable --now chatbot
 ```
+
+### Whatsapp chatbot
+You can make your chatbot public editing systemd file adding "-password <yourpass>" to ExecStart line:
+```
+sudo vi /etc/systemd/system/airmon_chatbot.service
+[Unit]
+Description=Franco Air Quality Monitor Chatbot
+After=airmon.service
+Requires=airmon.service
+
+[Service]
+TimeoutStartSec=100
+RestartSec=60
+WorkingDirectory=/opt/airmon/
+ExecStart=/opt/airmon/whatsapp/whatsapp_room -number <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666> -password SuperSecretPassword
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+#### Whatsapp chatbot commands
+From you own phone:
+- status		-> send all sensor data
+- host			-> send all sensor data of specific Arduino UNO Wifi sensor
+- help			-> show help
+
+From all:
+If you set "-password <yourpass>" in airmon_chatbot sending <yourpass> the chatbot will send you all sensor data
 
 #### Grafana Graph
 ##### Historical data

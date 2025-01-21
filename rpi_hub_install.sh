@@ -99,7 +99,7 @@ Requires=airmon.service
 TimeoutStartSec=100
 RestartSec=60
 WorkingDirectory=/opt/airmon/
-ExecStart=/opt/airmon/whatsapp/whatsapp_room <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>
+ExecStart=/opt/airmon/whatsapp/room_whatsapp -number $whats_number
 Restart=on-failure
 
 [Install]
@@ -109,9 +109,12 @@ EOF
 cd /opt/airmon
 echo "Please scan QR code with WhatsApp on your phone to link this device"
 whatsapp/send_whatsapp test_message $whats_number
+echo "Please scan QR code with WhatsApp on your phone to link this device for the second time"
+timeout 120s whatsapp/room_whatsapp -number $whats_number
 sudo systemctl enable --now airmon_alarm
 sudo systemctl enable --now airmon_chatbot
 echo "System installed and configured successfully!"
+echo "Look at readme file for supersecret whatsapp password"
 break
             ;;
             
@@ -153,15 +156,16 @@ echo "[Service]"
 echo "TimeoutStartSec=100"
 echo "RestartSec=60"
 echo "WorkingDirectory=/opt/airmon/"
-echo "ExecStart=/opt/airmon/whatsapp/whatsapp_room <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>"
+echo "ExecStart=/opt/airmon/whatsapp/room_whatsapp -number <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>"
 echo "Restart=on-failure"
 echo
 echo "[Install]"
 echo "WantedBy=multi-user.target"
 echo "EOF"
-echo "sudo systemctl enable --now airmon_alarm"
+echo "sudo systemctl enable --now airmon_chatbot"
 echo
 echo "System installed and configured successfully!"
+echo "Look at readme file for supersecret whatsapp password"
 break
             ;;
         *)

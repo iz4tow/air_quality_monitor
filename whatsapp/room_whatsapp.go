@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"strconv"
 	"strings"
+	"flag"
 )
 
 type SensorData struct {
@@ -35,13 +36,15 @@ type SensorData struct {
 }
 
 var WhatsmeowClient *whatsmeow.Client
+var wa_contact,password string
 
 func main() {
+	flag.StringVar(&wa_contact, "number","", "Whatsapp contact number whitout +, es 393312345654")
+	flag.StringVar(&password,"password", "", "A secret word that allow any contact to receive sensor data")
+	flag.Parse()
 	WhatsmeowClient = CreateClient()
 	ConnectClient(WhatsmeowClient)
 	WhatsmeowClient.AddEventHandler(HandleEvent)
-
-
 	WhatsmeowClient.Connect()
 	// Listen to Ctrl+C (you can also do something else that prevents the program from exiting)
 	c := make(chan os.Signal)
@@ -52,7 +55,7 @@ func main() {
 
 func CreateClient() *whatsmeow.Client {
 	dbLog := waLog.Stdout("Database", "INFO", true)
-	container, err := sqlstore.New("sqlite3", "file:accounts.db?_foreign_keys=on", dbLog)
+	container, err := sqlstore.New("sqlite3", "file:accounts2.db?_foreign_keys=on", dbLog)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -113,27 +116,37 @@ func CreateReply(host string)(string){
 		host, _ = reader.ReadString('\n')
 	}
 	fmt.Println(host)
-
-	resp, err := http.Get(fmt.Sprintf("http://%s/api/data", host))
-	if err != nil {
-		return "Sensor connection error!"
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "Malformed Json"
-	}
+	var failure int = 0
+	var response string
 	var data SensorData
-	if err := json.Unmarshal(body, &data); err != nil {
-		return "Malformed Json"
+	for failure<20{
+		resp, err := http.Get(fmt.Sprintf("http://%s/api/data", host))
+		if err != nil {
+			response="Sensor connection error!"
+			failure++
+			continue
+		}
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			response="Malformed Json"
+			failure++
+			continue
+		}
+		if err := json.Unmarshal(body, &data); err != nil {
+			response="Malformed Json"
+			failure++
+			continue
+		}else{
+			break
+		}
 	}
-	response:="Temperature: "+strconv.FormatFloat(data.Temperature,'f',2,64)+"\nHumidity: "+strconv.FormatFloat(data.Humidity,'f',2,64)+"\nPM2.5: "+strconv.FormatFloat(data.Dust25,'f',2,64)+"\nPM10: "+strconv.FormatFloat(data.Dust10,'f',2,64)+"\nCO2: "+strconv.FormatFloat(data.CO2,'f',2,64)+"\nNH3: "+strconv.FormatFloat(data.NH3,'f',2,64)+"\nNOx: "+strconv.FormatFloat(data.NOx,'f',2,64)+"\nCO: "+strconv.FormatFloat(data.CO,'f',2,64)
+	response="Temperature: "+strconv.FormatFloat(data.Temperature,'f',2,64)+"\nHumidity: "+strconv.FormatFloat(data.Humidity,'f',2,64)+"\nPM2.5: "+strconv.FormatFloat(data.Dust25,'f',2,64)+"\nPM10: "+strconv.FormatFloat(data.Dust10,'f',2,64)+"\nCO2: "+strconv.FormatFloat(data.CO2,'f',2,64)+"\nNH3: "+strconv.FormatFloat(data.NH3,'f',2,64)+"\nNOx: "+strconv.FormatFloat(data.NOx,'f',2,64)+"\nCO: "+strconv.FormatFloat(data.CO,'f',2,64)
 	return response
 }
 
 
 func HandleMessage(messageEvent *events.Message) {
-	wa_contact:=os.Args[1]
 	recipientJID := types.NewJID(wa_contact, types.DefaultUserServer) //types.DefaultUserServer automatically adds @s.whatsapp.net to the JID. es 393334455666
 ////////fmt.Printf("Message structure: %+v\n", messageEvent.Message)
 	var messageContent string
@@ -157,6 +170,11 @@ func HandleMessage(messageEvent *events.Message) {
 	}else if((messageContent == "help" || messageContent == "Help") && messageEvent.Info.Chat==recipientJID){
 		reply:="To get sensor data simply write: status\nTo get sensor data from specific host: host <ip>"
 		WhatsmeowClient.SendMessage(context.Background(), recipientJID, &waE2E.Message{
+			Conversation: &reply,
+		})
+	}else if(messageContent == password && password != ""){
+		reply := CreateReply("")
+		WhatsmeowClient.SendMessage(context.Background(), messageEvent.Info.Chat, &waE2E.Message{
 			Conversation: &reply,
 		})
 	}
