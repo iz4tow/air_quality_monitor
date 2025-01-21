@@ -3,6 +3,7 @@ module notify_whatsapp
 go 1.22.3
 
 require (
+	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/mdp/qrterminal v1.0.1
 	go.mau.fi/whatsmeow v0.0.0-20250104105216-918c879fcd19

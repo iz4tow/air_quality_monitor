@@ -87,19 +87,38 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 EOF
+
+
+sudo tee /etc/systemd/system/airmon_chatbot.service <<EOF
+[Unit]
+Description=Franco Air Quality Monitor Chatbot
+After=airmon.service
+Requires=airmon.service
+
+[Service]
+TimeoutStartSec=100
+RestartSec=60
+WorkingDirectory=/opt/airmon/
+ExecStart=/opt/airmon/whatsapp/whatsapp_room <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 cd /opt/airmon
 echo "Please scan QR code with WhatsApp on your phone to link this device"
 whatsapp/send_whatsapp test_message $whats_number
 sudo systemctl enable --now airmon_alarm
+sudo systemctl enable --now airmon_chatbot
 echo "System installed and configured successfully!"
-sudo systemctl enable airmon_alarm
 break
             ;;
             
 
         [Nn])
             echo "You chose No."
-echo "To enable alarm notification:"
+echo "To enable whatsapp integration:"
 echo "sudo su"
 echo "cd /opt/airmon"
 echo "whatsapp/whatsapp_login"
@@ -116,6 +135,25 @@ echo "TimeoutStartSec=100"
 echo "RestartSec=60"
 echo "WorkingDirectory=/opt/airmon/"
 echo "ExecStart=/opt/airmon/whatsapp_logger -number <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>"
+echo "Restart=on-failure"
+echo
+echo "[Install]"
+echo "WantedBy=multi-user.target"
+echo "EOF"
+echo "sudo systemctl enable --now airmon_alarm"
+echo
+echo "To enable chatbot service:"
+echo "sudo tee /etc/systemd/system/airmon_chatbot.service <<EOF"
+echo "[Unit]"
+echo "Description=Franco Air Quality Monitor Chatbot"
+echo "After=airmon.service"
+echo "Requires=airmon.service"
+echo
+echo "[Service]"
+echo "TimeoutStartSec=100"
+echo "RestartSec=60"
+echo "WorkingDirectory=/opt/airmon/"
+echo "ExecStart=/opt/airmon/whatsapp/whatsapp_room <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>"
 echo "Restart=on-failure"
 echo
 echo "[Install]"
