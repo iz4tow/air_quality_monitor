@@ -1,6 +1,6 @@
 # Air Quality Monitor
 # with Arduino WIFI R.2 sensor and Go Server
-# integrated with Whatsapp and Grafana
+# integrated with Whatsapp (alarm & chatbot) and Grafana
 A simple air quality monitor with Arduino UNO WIFI R2 and a Go server
 
 ## Hardware
@@ -64,6 +64,7 @@ cd /opt/airmon
 whatsapp/whatsapp_login
 #THEN SCAN QR CODE FROM YOUR PHONE ON WHATSAPP LINK-DEVICE 
 
+#ALARM SERVICE
 sudo tee /etc/systemd/system/airmon_alarm.service <<EOF
 [Unit]
 Description=Franco Air Quality Monitor Alarm
@@ -78,6 +79,25 @@ Restart=on-failure
 WantedBy=multi-user.target
 EOF
 sudo systemctl enable --now airmon_alarm
+
+#CHATBOT SERVICE
+sudo tee /etc/systemd/system/airmon_chatbot.service <<EOF
+[Unit]
+Description=Franco Air Quality Monitor Chatbot
+After=airmon.service
+Requires=airmon.service
+
+[Service]
+TimeoutStartSec=100
+RestartSec=60
+WorkingDirectory=/opt/airmon/
+ExecStart=/opt/airmon/whatsapp/whatsapp_room <YOUR NUMBER WITH COUNTRYCODE WITHOUT +, es: 393334455666>
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl enable --now chatbot
 ```
 
 #### Grafana Graph
