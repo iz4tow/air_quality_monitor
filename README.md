@@ -125,6 +125,7 @@ From you own phone:
 - status		-> send all sensor data
 - host			-> send all sensor data of specific Arduino UNO Wifi sensor
 - help			-> show help
+- ip aqi		-> send ip info
 
 From all:
 If you set "-password <yourpass>" in airmon_chatbot sending <yourpass> the chatbot will send you all sensor data

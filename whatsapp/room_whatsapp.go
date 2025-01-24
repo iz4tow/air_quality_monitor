@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"os/exec"
 	"syscall"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/mdp/qrterminal"
@@ -22,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 	"flag"
+	"net"
 )
 
 type SensorData struct {
@@ -141,7 +143,54 @@ func CreateReply(host string)(string){
 			break
 		}
 	}
-	response="Temperature: "+strconv.FormatFloat(data.Temperature,'f',2,64)+"\nHumidity: "+strconv.FormatFloat(data.Humidity,'f',2,64)+"\nPM2.5: "+strconv.FormatFloat(data.Dust25,'f',2,64)+"\nPM10: "+strconv.FormatFloat(data.Dust10,'f',2,64)+"\nCO2: "+strconv.FormatFloat(data.CO2,'f',2,64)+"\nNH3: "+strconv.FormatFloat(data.NH3,'f',2,64)+"\nNOx: "+strconv.FormatFloat(data.NOx,'f',2,64)+"\nCO: "+strconv.FormatFloat(data.CO,'f',2,64)
+	response="Temperature: "+strconv.FormatFloat(data.Temperature,'f',2,64)+" C\nHumidity: "+strconv.FormatFloat(data.Humidity,'f',2,64)+"%\nPM2.5: "+strconv.FormatFloat(data.Dust25,'f',2,64)+" ppm\nPM10: "+strconv.FormatFloat(data.Dust10,'f',2,64)+"\nCO2: "+strconv.FormatFloat(data.CO2,'f',2,64)+" ppm\nNH3: "+strconv.FormatFloat(data.NH3,'f',2,64)+" ppm\nNOx: "+strconv.FormatFloat(data.NOx,'f',2,64)+" ppm\nCO: "+strconv.FormatFloat(data.CO,'f',2,64)+" ppm"
+	return response
+}
+
+
+func IpConf()(string) {
+	// Get a list of all network interfaces
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		fmt.Printf("Error getting interfaces: %v\n", err)
+		return "Error getting interfaces"
+	}
+	var response string
+	for _, iface := range interfaces {
+		fmt.Printf("Name: %s\n", iface.Name)
+//		fmt.Printf("  MTU: %d\n", iface.MTU)
+//		fmt.Printf("  Hardware Address: %s\n", iface.HardwareAddr)
+
+
+		// Skip down interfaces or those that don't support multicast
+		if iface.Flags&net.FlagUp == 0 {
+//			fmt.Println("  Status: Down")
+			continue
+		}
+		if iface.Flags&net.FlagLoopback != 0 {
+//			fmt.Println("  Type: Loopback")
+			continue
+		}
+
+		// Get interface addresses
+		addrs, err := iface.Addrs()
+		if err != nil {
+			fmt.Printf("  Error getting addresses: %v\n", err)
+			continue
+		}
+		response=response+"\n######################\nName: "+iface.Name+"\n"
+		for _, addr := range addrs {
+			switch v := addr.(type) {
+			case *net.IPNet:
+				fmt.Printf("  IP Address: %s\n", v.IP.String())
+				fmt.Printf("  Subnet Mask: %s\n", v.Mask.String())
+				response=response+"IP Address: "+v.IP.String()+"\n"
+			case *net.IPAddr:
+				fmt.Printf("  IP Address: %s\n", v.IP.String())
+				response=response+"IP Address: "+v.IP.String()+"\n"
+			}
+		}
+	}
 	return response
 }
 
@@ -158,6 +207,32 @@ func HandleMessage(messageEvent *events.Message) {
 	if ((messageContent == "status" || messageContent == "Status") && messageEvent.Info.Chat==recipientJID){
 		log.Println("Status request received")
 		reply := CreateReply("")
+		WhatsmeowClient.SendMessage(context.Background(), recipientJID, &waE2E.Message{
+			Conversation: &reply,
+		})
+	}else if((messageContent == "ip aqi" || messageContent == "IP AQI") && messageEvent.Info.Chat==recipientJID){
+		reply:=IpConf()
+		WhatsmeowClient.SendMessage(context.Background(), recipientJID, &waE2E.Message{
+			Conversation: &reply,
+		})
+		// Command to execute the reboot
+		cmd := exec.Command("curl", "ipinfo.io")
+		// Capture standard output and error
+		output, _ := cmd.CombinedOutput()
+		reply = string(output)
+		WhatsmeowClient.SendMessage(context.Background(), recipientJID, &waE2E.Message{
+			Conversation: &reply,
+		})
+		//remote sensor ip
+		pipe, err := os.Open("/tmp/airmonpipe")
+		if err != nil {
+			reply = "No pipe file. Is sensor dead?"
+		}else{
+			reader := bufio.NewReader(pipe)
+			host, _ := reader.ReadString('\n')
+			reply = "Remote sensor IP: "+host
+		}
+		defer pipe.Close()
 		WhatsmeowClient.SendMessage(context.Background(), recipientJID, &waE2E.Message{
 			Conversation: &reply,
 		})
